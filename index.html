@@ -83,6 +83,7 @@ h1{font-family:var(--f-display);font-weight:800;letter-spacing:-.01em;font-size:
 .tally .big{font-family:var(--f-display);font-weight:800;letter-spacing:-.02em;font-size:clamp(44px,13vw,64px);line-height:.9}
 .tally .of{font-size:13px;color:var(--muted);font-weight:600}
 .stamp{margin:0 0 -8px;text-align:start;font-size:12px;color:var(--muted)}
+.sub{margin:2px 0 0;font-size:12px;color:var(--muted)}
 .status{text-align:center;font-weight:700;font-size:18px;margin:0}
 .status.ok{color:var(--ok)}
 .status.short{color:var(--warn)}
@@ -209,7 +210,7 @@ h1{font-family:var(--f-display);font-weight:800;letter-spacing:-.01em;font-size:
 
     <section class="list" aria-label="המפלגות">
       <div class="list-head">
-        <h2>המפלגות</h2>
+        <div><h2>המפלגות</h2><p class="sub" id="sub"></p></div>
         <div class="tools">
           <button type="button" class="tool" id="editBtn" aria-pressed="false">עריכת מנדטים</button>
           <button type="button" class="tool" id="reset">ניקוי</button>
@@ -260,7 +261,7 @@ const SOURCES = {
   kan:{label:"מדגם כאן 11", stamp:"מדגם כאן 11 · עדכון לילי", short:"מדגם מעודכן", note:"מדגם כאן חדשות (קנטאר), אחרי העדכון של הלילה.",
        seats:{lk:27,ys:21,bh:13,jl:11,dm:9,yb:8,rm:7,sh:6,ut:6,oy:6,rz:6}},
   // LIVE-RESULTS (updated automatically, keep on one line)
-  real:{label:"תוצאות אמת", stamp:"תוצאות אמת חלקיות · עדכון אחרון: 28.10 06:22, נספרו 5,037 קלפיות (42%)", seats:{lk:28,ys:20,jl:12,bh:11,ut:8,yb:8,oy:7,dm:7,sh:7,rz:7,rm:5,hm:0,ay:0}}
+  real:{label:"תוצאות אמת", updated:"28.10 06:22", counted:37, final:false, seats:{lk:28,ys:20,jl:12,bh:11,ut:8,yb:8,oy:7,dm:7,sh:7,rz:7,rm:5,hm:0,ay:0}}
 };
 const LINKS = [
   ["מדגם חדשות 12, עדכון 02:28 (זמן ישראל)","https://www.zman.co.il/live/737252/"],
@@ -370,9 +371,11 @@ function setSeat(id, v){
 
 /* ---- rendering ---- */
 function renderSources(){
-  const live = st => st + (st.includes("הסופיות") ? "" : " (מתעדכן כל שעה)");
-  $("stamp").textContent = state.src==="m" ? `המספרים שלי · על בסיס ${SOURCES[state.base].stamp}`
-    : state.src==="real" ? live(SOURCES.real.stamp) : SOURCES[state.src].stamp;
+  const r = SOURCES.real, done = r.final || r.counted >= 100;
+  const counted = done ? "תוצאות אמת - נספרו 100% מהקולות" : `תוצאות אמת חלקיות - נספרו ${r.counted}% מהקולות`;
+  $("stamp").textContent = `עדכון אחרון: ${r.updated}` + (done ? "" : " (מתעדכן כל שעה)");
+  $("sub").textContent = state.src==="real" ? counted
+    : state.src==="m" ? `המספרים שלי · על בסיס ${counted}` : SOURCES[state.src].stamp;
 }
 
 function renderRows(){
