@@ -534,7 +534,8 @@ function readHash(){
   if (!h) return false;
   const parts = h.split("-").filter(Boolean);
   const first = parts[0] || "";
-  if (SOURCES[first]){ state.src = parts.shift(); }
+  if (first==="n12" || first==="kan"){ parts.shift(); state.src = DEFAULT_SRC; }  // old links: open with the current real results
+  else if (SOURCES[first]){ state.src = parts.shift(); }
   else if (/^m\d+$/.test(first) && first.length === 1 + KEYS.length*2){
     parts.shift();
     state.custom = Object.fromEntries(KEYS.map((id,i)=>[id, +first.substr(1+i*2,2)]));
