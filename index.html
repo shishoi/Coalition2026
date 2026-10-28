@@ -161,6 +161,15 @@ h1{font-family:var(--f-display);font-weight:800;letter-spacing:-.01em;font-size:
 .btn svg{width:18px;height:18px}
 .btn-primary{background:var(--ok);color:var(--on-party)}
 .btn-ghost{background:var(--accent-soft);color:var(--accent)}
+.btn-icon{background:transparent;border:1px solid var(--line);color:var(--warn);padding:10px 11px}
+.btn-icon[aria-expanded="true"]{background:var(--accent-soft)}
+.sheet{position:fixed;z-index:25;left:max(16px,env(safe-area-inset-left,0px));bottom:calc(76px + env(safe-area-inset-bottom,0px));width:min(360px,calc(100% - 32px));background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:0 12px 32px rgba(10,20,40,.18);padding:14px;display:flex;flex-direction:column;gap:10px}
+.sheet-head{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:16px}
+.sheet-x{border:0;background:none;font-size:24px;line-height:1;color:var(--muted);padding:0 4px}
+.sheet textarea{width:100%;font:inherit;font-size:15px;border:1px solid var(--line);border-radius:10px;padding:10px;background:var(--bg);color:var(--ink);resize:vertical}
+.sheet-foot{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.sheet-note{font-size:12px;color:var(--muted)}
+.sheet a[aria-disabled="true"]{opacity:.45;pointer-events:none}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:10px;font-weight:700;font-size:14px;z-index:30;opacity:0;pointer-events:none;transition:opacity .2s}
 .toast.show{opacity:1}
 .fallback{width:100%;min-height:110px;font:inherit;font-size:14px;border:1px solid var(--line);border-radius:10px;padding:10px;background:var(--surface);color:var(--ink)}
@@ -229,6 +238,15 @@ h1{font-family:var(--f-display);font-weight:800;letter-spacing:-.01em;font-size:
     <div class="dock-count"><b class="num" id="dockNum">0</b><small id="dockSub">חסרים 61</small></div>
     <button type="button" class="btn btn-ghost" id="copyBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg><span class="lbl">העתקה</span></button>
     <a class="btn btn-primary" id="waBtn" href="https://wa.me/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.4.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.5-.3Z"/></svg><span class="lbl">שליחה בוואטסאפ</span></a>
+    <button type="button" class="btn btn-icon" id="ideaBtn" aria-label="הצעה לשיפור" aria-expanded="false" aria-controls="ideaSheet" title="הצעה לשיפור"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.6 10.8c.6.5 1 1.2 1 2V17h5.2v-1.2c0-.8.4-1.5 1-2A6 6 0 0 0 12 3Z"/></svg></button>
+  </div>
+</div>
+<div class="sheet" id="ideaSheet" role="dialog" aria-labelledby="ideaTitle" hidden>
+  <div class="sheet-head"><b id="ideaTitle">יש לכם רעיון לשיפור?</b><button type="button" class="sheet-x" id="ideaClose" aria-label="סגירה">×</button></div>
+  <textarea id="ideaText" rows="4" placeholder="מה הייתם משנים או מוסיפים?"></textarea>
+  <div class="sheet-foot">
+    <span class="sheet-note">ההודעה תיפתח בוואטסאפ שלכם, ושם לוחצים על שליחה.</span>
+    <a class="btn btn-primary" id="ideaSend" href="https://wa.me/972546584377" target="_blank" rel="noopener" aria-disabled="true">שליחה</a>
   </div>
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
@@ -261,7 +279,7 @@ const SOURCES = {
   kan:{label:"מדגם כאן 11", stamp:"מדגם כאן 11 · עדכון לילי", short:"מדגם מעודכן", note:"מדגם כאן חדשות (קנטאר), אחרי העדכון של הלילה.",
        seats:{lk:27,ys:21,bh:13,jl:11,dm:9,yb:8,rm:7,sh:6,ut:6,oy:6,rz:6}},
   // LIVE-RESULTS (updated automatically, keep on one line)
-  real:{label:"תוצאות אמת", updated:"28.10 06:22", counted:37, final:false, seats:{lk:28,ys:20,jl:12,bh:11,ut:8,yb:8,oy:7,dm:7,sh:7,rz:7,rm:5,hm:0,ay:0}}
+  real:{label:"תוצאות אמת", updated:"28.10 06:22", src:"וואלה", counted:37, final:false, seats:{lk:28,ys:20,jl:12,bh:11,ut:8,yb:8,oy:7,dm:7,sh:7,rz:7,rm:5,hm:0,ay:0}}
 };
 const LINKS = [
   ["מדגם חדשות 12, עדכון 02:28 (זמן ישראל)","https://www.zman.co.il/live/737252/"],
@@ -373,7 +391,8 @@ function setSeat(id, v){
 function renderSources(){
   const r = SOURCES.real, done = r.final || r.counted >= 100;
   const counted = done ? "תוצאות אמת - נספרו 100% מהקולות" : `תוצאות אמת חלקיות - נספרו ${r.counted}% מהקולות`;
-  $("stamp").textContent = `עדכון אחרון: ${r.updated}` + (done ? "" : " (מתעדכן כל שעה)");
+  const from = !r.src ? "" : /^[A-Za-z0-9]/.test(r.src) ? ` מ-${r.src}` : ` מ${r.src}`;
+  $("stamp").textContent = `עדכון אחרון: ${r.updated}` + (done ? (r.src ? ` (מקור: ${r.src})` : "") : ` (מתעדכן כל שעה${from})`);
   $("sub").textContent = state.src==="real" ? counted
     : state.src==="m" ? `המספרים שלי · על בסיס ${counted}` : SOURCES[state.src].stamp;
 }
@@ -499,6 +518,25 @@ $("copyBtn").addEventListener("click", ()=>{
   try { navigator.clipboard.writeText(text).then(()=>toast("הועתק! אפשר להדביק בכל צ'אט"), fallback); }
   catch(e){ fallback(); }
 });
+
+/* ---- feedback: opens the visitor's WhatsApp with a message to the site owner ---- */
+const FEEDBACK_WA = "972546584377";
+function setIdea(open){
+  $("ideaSheet").hidden = !open;
+  $("ideaBtn").setAttribute("aria-expanded", open);
+  if (open) $("ideaText").focus();
+}
+$("ideaBtn").addEventListener("click", ()=>setIdea($("ideaSheet").hidden));
+$("ideaClose").addEventListener("click", ()=>setIdea(false));
+$("ideaText").addEventListener("input", ()=>{
+  const t = $("ideaText").value.trim();
+  $("ideaSend").setAttribute("aria-disabled", !t);
+  $("ideaSend").href = `https://wa.me/${FEEDBACK_WA}?text=` + encodeURIComponent("💡 הצעה לשיפור לאתר הקואליציה:\n" + t);
+});
+$("ideaSend").addEventListener("click", ()=>{
+  setTimeout(()=>{ setIdea(false); $("ideaText").value=""; $("ideaSend").setAttribute("aria-disabled", true); toast("תודה! לחצו על שליחה בוואטסאפ"); }, 300);
+});
+document.addEventListener("keydown", e=>{ if (e.key==="Escape" && !$("ideaSheet").hidden) setIdea(false); });
 
 /* ---- interactions ---- */
 document.addEventListener("click", e=>{
