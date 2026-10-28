@@ -174,6 +174,8 @@ h1{font-family:var(--f-display);font-weight:800;letter-spacing:-.01em;font-size:
 .sheet textarea{width:100%;font:inherit;font-size:15px;border:1px solid var(--line);border-radius:10px;padding:10px;background:var(--bg);color:var(--ink);resize:vertical}
 .sheet-foot{display:flex;align-items:center;justify-content:space-between;gap:10px}
 .sheet-note{font-size:12px;color:var(--muted)}
+.sheet-form{display:flex;flex-direction:column;gap:10px}
+.sheet-done{margin:0;padding:22px 6px;text-align:center;font-weight:700;font-size:16px;color:var(--ok)}
 .sheet a[aria-disabled="true"]{opacity:.45;pointer-events:none}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:10px;font-weight:700;font-size:14px;z-index:30;opacity:0;pointer-events:none;transition:opacity .2s}
 .toast.show{opacity:1}
@@ -254,11 +256,14 @@ h1{font-family:var(--f-display);font-weight:800;letter-spacing:-.01em;font-size:
 </div>
 <div class="sheet" id="ideaSheet" role="dialog" aria-labelledby="ideaTitle" hidden>
   <div class="sheet-head"><b id="ideaTitle" data-i18n="ideaTitle">יש לכם רעיון לשיפור?</b><button type="button" class="sheet-x" id="ideaClose" data-i18n-aria="close" aria-label="סגירה">×</button></div>
+  <div class="sheet-form" id="ideaForm">
   <textarea id="ideaText" rows="4" data-i18n-ph="ideaPh" placeholder="מה הייתם משנים או מוסיפים?"></textarea>
   <div class="sheet-foot">
-    <span class="sheet-note" data-i18n="ideaNote">ההודעה תיפתח בוואטסאפ שלכם, ושם לוחצים על שליחה.</span>
+    <span class="sheet-note" id="ideaNote"></span>
     <a class="btn btn-primary" id="ideaSend" href="https://wa.me/972546584377" target="_blank" rel="noopener" aria-disabled="true" data-i18n="send">שליחה</a>
   </div>
+  </div>
+  <p class="sheet-done" id="ideaDone" role="status" hidden></p>
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
@@ -322,6 +327,7 @@ const I18N = {
     copy:"העתקה", wa:"שליחה בוואטסאפ", shareText:"טקסט לשיתוף", lang:"שפה",
     idea:"הצעה לשיפור", ideaTitle:"יש לכם רעיון לשיפור?", ideaPh:"מה הייתם משנים או מוסיפים?",
     ideaNote:"ההודעה תיפתח בוואטסאפ שלכם, ושם לוחצים על שליחה.", send:"שליחה", close:"סגירה",
+    ideaNoteMail:"ההצעה נשלחת בצורה אנונימית.", sending:"שולח…", fbThanks:"תודה על הפידבק! ההצעה נשלחה.", sendFail:"השליחה לא הצליחה. נסו שוב בעוד רגע.",
     blocs:{n:"גוש נתניהו", c:"גוש השינוי", a:"מפלגות ערביות", o:"ללא גוש"}, arabShort:"ערביות",
     stamp:(u,s,done)=>`עדכון אחרון: ${u}` + (done ? (s ? ` (מקור: ${s})` : "")
       : ` (מתעדכן כל שעה${!s ? "" : /^[A-Za-z0-9]/.test(s) ? ` מ-${s}` : ` מ${s}`})`),
@@ -354,6 +360,7 @@ const I18N = {
     copy:"Copy", wa:"Send on WhatsApp", shareText:"Text to share", lang:"Language",
     idea:"Suggest an improvement", ideaTitle:"Got an idea for improving this?", ideaPh:"What would you change or add?",
     ideaNote:"The message opens in your WhatsApp. Tap send there.", send:"Send", close:"Close",
+    ideaNoteMail:"Your suggestion is sent anonymously.", sending:"Sending…", fbThanks:"Thanks for the feedback! Your suggestion was sent.", sendFail:"Couldn't send it. Please try again in a moment.",
     blocs:{n:"Netanyahu bloc", c:"Change bloc", a:"Arab parties", o:"No bloc"}, arabShort:"Arab parties",
     stamp:(u,s,done)=>`Last updated: ${u}` + (done ? (s ? ` (source: ${s})` : "") : ` (updated hourly${s ? ` from ${s}` : ""})`),
     counted:(n,done)=> done ? "Results · 100% of votes counted" : `Partial results · ${n}% of votes counted`,
@@ -385,6 +392,7 @@ const I18N = {
     copy:"Copier", wa:"Envoyer sur WhatsApp", shareText:"Texte à partager", lang:"Langue",
     idea:"Suggérer une amélioration", ideaTitle:"Une idée pour améliorer le site ?", ideaPh:"Que changeriez-vous ou ajouteriez-vous ?",
     ideaNote:"Le message s'ouvre dans votre WhatsApp. Appuyez sur Envoyer.", send:"Envoyer", close:"Fermer",
+    ideaNoteMail:"Votre suggestion est envoyée de façon anonyme.", sending:"Envoi…", fbThanks:"Merci pour votre retour ! Votre suggestion a été envoyée.", sendFail:"L'envoi a échoué. Réessayez dans un instant.",
     blocs:{n:"Bloc Netanyahou", c:"Bloc du changement", a:"Partis arabes", o:"Sans bloc"}, arabShort:"Partis arabes",
     stamp:(u,s,done)=>`Dernière mise à jour : ${u}` + (done ? (s ? ` (source : ${s})` : "") : ` (mise à jour toutes les heures${s ? `, source : ${s}` : ""})`),
     counted:(n,done)=> done ? "Résultats · 100 % des voix dépouillées" : `Résultats partiels · ${n} % des voix dépouillées`,
@@ -480,6 +488,7 @@ function setLang(l, save){
   root.lang = l; root.dir = T.dir;
   document.title = T.title;
   applyStatic(); buildChips(); buildHemi(); renderLang();
+  $("ideaNote").textContent = FEEDBACK_KEY ? T.ideaNoteMail : T.ideaNote;
   if (save){ try { localStorage.setItem(LANG_KEY, l); } catch(e){} }
 }
 function setMenu(open){
@@ -672,23 +681,55 @@ $("copyBtn").addEventListener("click", ()=>{
   catch(e){ fallback(); }
 });
 
-/* ---- feedback: opens the visitor's WhatsApp with a message to the site owner ---- */
+/* ---- feedback ----
+   With a Web3Forms access key, suggestions are emailed to the site owner in the background (anonymous).
+   Without one, the button opens the visitor's WhatsApp with a ready message instead. */
+const FEEDBACK_KEY = "";
 const FEEDBACK_WA = "972546584377";
+let ideaBusy = false;
+const feedbackSubject = () => "💡 הצעה לשיפור לאתר הקואליציה" + (state.lang==="he" ? "" : ` (${T.name})`);
 function setIdea(open){
   $("ideaSheet").hidden = !open;
   $("ideaBtn").setAttribute("aria-expanded", open);
-  if (open) $("ideaText").focus();
+  if (open){
+    $("ideaForm").hidden = false; $("ideaDone").hidden = true;
+    $("ideaSend").setAttribute("aria-disabled", !$("ideaText").value.trim());
+    $("ideaText").focus();
+  }
+}
+async function sendFeedback(text){
+  const res = await fetch("https://api.web3forms.com/submit", {
+    method:"POST", headers:{"Content-Type":"application/json", "Accept":"application/json"},
+    body: JSON.stringify({access_key:FEEDBACK_KEY, subject:feedbackSubject(), from_name:"אתר הקואליציה",
+      message:text, "שפה":T.name, "קישור":location.href})
+  });
+  const data = await res.json().catch(()=>({}));
+  if (!res.ok || !data.success) throw new Error(data.message || String(res.status));
 }
 $("ideaBtn").addEventListener("click", ()=>setIdea($("ideaSheet").hidden));
 $("ideaClose").addEventListener("click", ()=>setIdea(false));
 $("ideaText").addEventListener("input", ()=>{
   const t = $("ideaText").value.trim();
-  const tag = state.lang==="he" ? "" : ` (${T.name})`;
-  $("ideaSend").setAttribute("aria-disabled", !t);
-  $("ideaSend").href = `https://wa.me/${FEEDBACK_WA}?text=` + encodeURIComponent(`💡 הצעה לשיפור לאתר הקואליציה${tag}:\n` + t);
+  $("ideaSend").setAttribute("aria-disabled", !t || ideaBusy);
+  if (!FEEDBACK_KEY) $("ideaSend").href = `https://wa.me/${FEEDBACK_WA}?text=` + encodeURIComponent(feedbackSubject() + ":\n" + t);
 });
-$("ideaSend").addEventListener("click", ()=>{
-  setTimeout(()=>{ setIdea(false); $("ideaText").value=""; $("ideaSend").setAttribute("aria-disabled", true); toast(T.thanks); }, 300);
+$("ideaSend").addEventListener("click", e=>{
+  const text = $("ideaText").value.trim();
+  if (!FEEDBACK_KEY){
+    setTimeout(()=>{ setIdea(false); $("ideaText").value=""; $("ideaSend").setAttribute("aria-disabled", true); toast(T.thanks); }, 300);
+    return;
+  }
+  e.preventDefault();
+  if (!text || ideaBusy) return;
+  ideaBusy = true;
+  $("ideaSend").setAttribute("aria-disabled", true); $("ideaSend").textContent = T.sending;
+  sendFeedback(text).then(()=>{
+    $("ideaText").value = "";
+    $("ideaForm").hidden = true; $("ideaDone").textContent = T.fbThanks; $("ideaDone").hidden = false;
+    setTimeout(()=>{ if (!$("ideaDone").hidden) setIdea(false); }, 2600);
+  }).catch(()=>{
+    toast(T.sendFail); $("ideaSend").setAttribute("aria-disabled", false);
+  }).finally(()=>{ ideaBusy = false; $("ideaSend").textContent = T.send; });
 });
 
 /* ---- interactions ---- */
