@@ -96,6 +96,37 @@ h1{font-family:var(--f-display);font-weight:800;letter-spacing:-.01em;font-size:
 .pm-line{text-align:center;color:var(--muted);font-size:14px;margin:-8px 0 0}
 .pm-line b{color:var(--ink)}
 
+.vote{display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center}
+.vote-btn{border:0;border-radius:14px;padding:13px 22px;background:var(--accent);color:var(--surface);font-weight:800;font-size:17px;display:inline-flex;align-items:center;gap:10px;box-shadow:0 6px 18px color-mix(in srgb,var(--accent) 35%,transparent);transition:transform .15s}
+.vote-btn:hover{transform:translateY(-1px)}
+.vote-btn svg{width:22px;height:22px;flex:none}
+.vote-btn.done{background:var(--accent-soft);color:var(--accent);box-shadow:none;font-size:15px;font-weight:700;padding:10px 16px}
+.vote-btn[aria-busy="true"]{opacity:.7}
+.vote-sub{margin:0;font-size:13px;color:var(--muted);max-width:42ch}
+.poll-link{align-self:center;border:0;background:none;color:var(--accent);font-weight:700;font-size:14px;text-decoration:underline;text-underline-offset:3px;padding:2px 4px}
+.modal{position:fixed;inset:0;z-index:35;background:rgba(8,14,28,.48);display:flex;align-items:flex-end;justify-content:center;
+  padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) calc(16px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+@media (min-width:600px){.modal{align-items:center}}
+.modal[hidden]{display:none}
+.modal-card{width:min(560px,100%);max-height:100%;overflow:auto;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.modal-head{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.modal-head h2{margin:0;font-size:20px;font-weight:700}
+.poll-meta{margin:0;font-size:13px;color:var(--muted)}
+.poll-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.poll-row{border:1px solid var(--line);border-radius:14px;padding:10px 12px;display:flex;flex-direction:column;gap:8px}
+.poll-row.mine{border-color:var(--accent);background:var(--accent-soft)}
+.poll-top{display:flex;align-items:flex-start;gap:10px}
+.poll-rank{font-weight:800;color:var(--muted);min-width:1.5ch;font-variant-numeric:tabular-nums;line-height:22px}
+.poll-parties{flex:1;min-width:0;display:flex;flex-wrap:wrap;gap:4px}
+.pchip{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:700;border:1px solid var(--line);border-radius:999px;padding:1px 8px;background:var(--surface);line-height:18px}
+.pchip i{width:8px;height:8px;border-radius:50%;background:var(--c);flex:none}
+.pchip.pm{border-color:var(--c);box-shadow:inset 0 0 0 1px var(--c)}
+.poll-pct{font-weight:800;font-size:18px;font-variant-numeric:tabular-nums;white-space:nowrap;line-height:22px}
+.poll-bar{height:6px;border-radius:4px;background:var(--empty);overflow:hidden}
+.poll-bar span{display:block;height:100%;border-radius:4px}
+.poll-foot{display:flex;justify-content:space-between;gap:4px 10px;font-size:12px;color:var(--muted);flex-wrap:wrap}
+.mine-tag{color:var(--accent)}
+.poll-empty{padding:18px 4px;text-align:center;color:var(--muted)}
 .blocs{display:flex;justify-content:center;flex-wrap:wrap;gap:6px 14px;font-size:14px;font-weight:700}
 .blocs span{display:inline-flex;align-items:center;gap:6px}
 .blocs i{width:10px;height:10px;border-radius:50%;background:var(--b)}
@@ -174,7 +205,9 @@ h1{font-family:var(--f-display);font-weight:800;letter-spacing:-.01em;font-size:
 .sheet textarea{width:100%;font:inherit;font-size:15px;border:1px solid var(--line);border-radius:10px;padding:10px;background:var(--bg);color:var(--ink);resize:vertical}
 .sheet-foot{display:flex;align-items:center;justify-content:space-between;gap:10px}
 .sheet-note{font-size:12px;color:var(--muted)}
-.sheet a[aria-disabled="true"]{opacity:.45;pointer-events:none}
+.sheet .btn:disabled{opacity:.45;cursor:default}
+.sheet-form{display:flex;flex-direction:column;gap:10px}
+.sheet-done{margin:0;padding:22px 6px;text-align:center;font-weight:700;font-size:16px;color:var(--ok)}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:10px;font-weight:700;font-size:14px;z-index:30;opacity:0;pointer-events:none;transition:opacity .2s}
 .toast.show{opacity:1}
 .fallback{width:100%;min-height:110px;font:inherit;font-size:14px;border:1px solid var(--line);border-radius:10px;padding:10px;background:var(--surface);color:var(--ink)}
@@ -219,6 +252,10 @@ h1{font-family:var(--f-display);font-weight:800;letter-spacing:-.01em;font-size:
       </div>
       <p class="status" id="status"></p>
       <p class="pm-line" id="pmLine"></p>
+      <div class="vote" id="voteBox" hidden>
+        <button type="button" class="vote-btn" id="voteBtn"></button>
+        <p class="vote-sub" id="voteSub"></p>
+      </div>
       <div class="bar-wrap">
         <div class="bar" id="bar"></div>
         <div class="bar-tick"><i></i><em>61</em></div>
@@ -226,6 +263,7 @@ h1{font-family:var(--f-display);font-weight:800;letter-spacing:-.01em;font-size:
       </div>
       <div class="blocs" id="blocs"></div>
       <div class="presets" id="presets"><span data-i18n="shortcuts">קיצורים:</span></div>
+      <button type="button" class="poll-link" id="pollLink" hidden></button>
     </section>
 
     <section class="list" data-i18n-aria="parties" aria-label="המפלגות">
@@ -254,13 +292,23 @@ h1{font-family:var(--f-display);font-weight:800;letter-spacing:-.01em;font-size:
 </div>
 <div class="sheet" id="ideaSheet" role="dialog" aria-labelledby="ideaTitle" hidden>
   <div class="sheet-head"><b id="ideaTitle" data-i18n="ideaTitle">יש לכם רעיון לשיפור?</b><button type="button" class="sheet-x" id="ideaClose" data-i18n-aria="close" aria-label="סגירה">×</button></div>
-  <textarea id="ideaText" rows="4" data-i18n-ph="ideaPh" placeholder="מה הייתם משנים או מוסיפים?"></textarea>
-  <div class="sheet-foot">
-    <span class="sheet-note" data-i18n="ideaNote">ההודעה תיפתח בוואטסאפ שלכם, ושם לוחצים על שליחה.</span>
-    <a class="btn btn-primary" id="ideaSend" href="https://wa.me/972546584377" target="_blank" rel="noopener" aria-disabled="true" data-i18n="send">שליחה</a>
+  <div class="sheet-form" id="ideaForm">
+    <textarea id="ideaText" rows="4" maxlength="2000" data-i18n-ph="ideaPh" placeholder="מה הייתם משנים או מוסיפים?"></textarea>
+    <div class="sheet-foot">
+      <span class="sheet-note" data-i18n="ideaNote">ההצעה נשלחת בצורה אנונימית.</span>
+      <button type="button" class="btn btn-primary" id="ideaSend" disabled data-i18n="send">שליחה</button>
+    </div>
   </div>
+  <p class="sheet-done" id="ideaDone" role="status" hidden></p>
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div class="modal" id="pollModal" hidden>
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="pollTitle">
+    <div class="modal-head"><h2 id="pollTitle" data-i18n="pollTitle">תוצאות הסקר</h2><button type="button" class="sheet-x" id="pollClose" data-i18n-aria="close" aria-label="סגירה">×</button></div>
+    <p class="poll-meta" id="pollMeta"></p>
+    <ol class="poll-list" id="pollList"></ol>
+  </div>
+</div>
 
 <script>
 const SHARE_BASE = (location.protocol.startsWith("http") ? location.href.split("#")[0] : "");
@@ -321,12 +369,20 @@ const I18N = {
     parties:"המפלגות", edit:"עריכת מנדטים", done:"סיום עריכה", clear:"ניקוי",
     copy:"העתקה", wa:"שליחה בוואטסאפ", shareText:"טקסט לשיתוף", lang:"שפה",
     idea:"הצעה לשיפור", ideaTitle:"יש לכם רעיון לשיפור?", ideaPh:"מה הייתם משנים או מוסיפים?",
-    ideaNote:"ההודעה תיפתח בוואטסאפ שלכם, ושם לוחצים על שליחה.", send:"שליחה", close:"סגירה",
+    ideaNote:"ההצעה נשלחת בצורה אנונימית.", send:"שליחה", close:"סגירה",
+    sending:"שולח…", fbThanks:"תודה על הפידבק! ההצעה נשלחה.", sendFail:"השליחה לא הצליחה. נסו שוב בעוד רגע.",
     blocs:{n:"גוש נתניהו", c:"גוש השינוי", a:"מפלגות ערביות", o:"ללא גוש"}, arabShort:"ערביות",
     stamp:(u,s,done)=>`עדכון אחרון: ${u}` + (done ? (s ? ` (מקור: ${s})` : "")
       : ` (מתעדכן כל שעה${!s ? "" : /^[A-Za-z0-9]/.test(s) ? ` מ-${s}` : ` מ${s}`})`),
     counted:(n,done)=> done ? "תוצאות אמת - נספרו 100% מהקולות" : `תוצאות אמת חלקיות - נספרו ${n}% מהקולות`,
     mine:(n,done)=> "המספרים שלי · על בסיס " + (done ? "תוצאות אמת - נספרו 100% מהקולות" : `תוצאות אמת חלקיות - נספרו ${n}% מהקולות`),
+    voteCta:"הצביעו והשפיעו!", voteSub:"שתפו את הבחירה שלכם, ואולי היא תגיע למקבלי ההחלטות...",
+    voteDone:"הצבעתם לממשלה הזו ✓", voteSeeResults:"לתוצאות הסקר", voteChange:"עדכנו את ההצבעה שלכם",
+    voteChangeSub:"אפשר להצביע לממשלה אחת. ההצבעה הקודמת שלכם תוחלף.", voting:"שולח…", voteFail:"ההצבעה לא נשמרה. נסו שוב.",
+    pollTitle:"תוצאות הסקר", pollLink:n=>`תוצאות הסקר · ${n===1 ? "הצבעה אחת" : `${n} הצבעות`}`,
+    pollMeta:(v,c)=>`${v===1 ? "הצבעה אחת" : `${v} הצבעות`} · ${c===1 ? "הרכב אחד" : `${c} הרכבים שונים`}`,
+    pollExamples:e=>`כולל ${e} הצבעות לדוגמה`, pollEmpty:"עוד אין הצבעות. היו הראשונים להצביע!", pollMine:"הבחירה שלכם",
+    pollPm:l=>`רה"מ: ${l}`, pollSeats:s=>`${s} מנדטים`, pollVotes:n=> n===1 ? "קול אחד" : `${n} קולות`,
     pick:"בחרו מפלגות כדי להתחיל",
     ok:(t,stable)=> stable ? `יש ממשלה! רוב יציב של ${t}` : `יש ממשלה! רוב של ${t}`,
     short:n=> n===1 ? "חסר מנדט אחד לרוב" : `חסרים ${n} מנדטים לרוב`,
@@ -341,7 +397,7 @@ const I18N = {
     shareNone:"עוד לא בחרתי מפלגות. נסו אתם:", sharePm:l=>`ראש הממשלה: ${l}`,
     shareTotal:(t,ok)=> ok ? `סה"כ ${t} מנדטים: יש ממשלה ✅` : `סה"כ ${t} מנדטים: חסרים ${61-t} ❌`,
     shareCta:"תצליחו לבנות ממשלה טובה יותר?",
-    copied:"הועתק! אפשר להדביק בכל צ'אט", selectCopy:"סמנו והעתיקו את הטקסט", thanks:"תודה! לחצו על שליחה בוואטסאפ"},
+    copied:"הועתק! אפשר להדביק בכל צ'אט", selectCopy:"סמנו והעתיקו את הטקסט"},
 
   en:{dir:"ltr", name:"English", title:"Build the government · Knesset 26",
     eyebrow:"Israel's 26th Knesset election · 27 October 2026", h1:"Build the government",
@@ -353,11 +409,19 @@ const I18N = {
     parties:"Parties", edit:"Edit seats", done:"Done", clear:"Clear",
     copy:"Copy", wa:"Send on WhatsApp", shareText:"Text to share", lang:"Language",
     idea:"Suggest an improvement", ideaTitle:"Got an idea for improving this?", ideaPh:"What would you change or add?",
-    ideaNote:"The message opens in your WhatsApp. Tap send there.", send:"Send", close:"Close",
+    ideaNote:"Your suggestion is sent anonymously.", send:"Send", close:"Close",
+    sending:"Sending…", fbThanks:"Thanks for the feedback! Your suggestion was sent.", sendFail:"Couldn't send it. Please try again in a moment.",
     blocs:{n:"Netanyahu bloc", c:"Change bloc", a:"Arab parties", o:"No bloc"}, arabShort:"Arab parties",
     stamp:(u,s,done)=>`Last updated: ${u}` + (done ? (s ? ` (source: ${s})` : "") : ` (updated hourly${s ? ` from ${s}` : ""})`),
     counted:(n,done)=> done ? "Results · 100% of votes counted" : `Partial results · ${n}% of votes counted`,
     mine:(n,done)=> done ? "My numbers · based on the full results" : `My numbers · based on partial results (${n}% of votes counted)`,
+    voteCta:"Vote and make an impact!", voteSub:"Share your choice. Maybe it will reach the decision makers...",
+    voteDone:"You voted for this government ✓", voteSeeResults:"See the poll results", voteChange:"Update your vote",
+    voteChangeSub:"You can vote for one government. Your previous vote will be replaced.", voting:"Sending…", voteFail:"Your vote wasn't saved. Please try again.",
+    pollTitle:"Poll results", pollLink:n=>`Poll results · ${n} ${n===1 ? "vote" : "votes"}`,
+    pollMeta:(v,c)=>`${v} ${v===1 ? "vote" : "votes"} · ${c} ${c===1 ? "coalition" : "different coalitions"}`,
+    pollExamples:e=>`includes ${e} example votes`, pollEmpty:"No votes yet. Be the first to vote!", pollMine:"Your choice",
+    pollPm:l=>`PM: ${l}`, pollSeats:s=>`${s} seats`, pollVotes:n=>`${n} ${n===1 ? "vote" : "votes"}`,
     pick:"Pick parties to get started",
     ok:(t,stable)=> stable ? `Government formed! A stable majority of ${t}` : `Government formed! A majority of ${t}`,
     short:n=>`${n} ${n===1 ? "seat" : "seats"} short of a majority`,
@@ -372,7 +436,7 @@ const I18N = {
     shareNone:"I haven't picked parties yet. Your turn:", sharePm:l=>`Prime minister: ${l}`,
     shareTotal:(t,ok)=> ok ? `${t} seats in total: government formed ✅` : `${t} seats in total: ${61-t} short ❌`,
     shareCta:"Can you build a better government?",
-    copied:"Copied! Paste it into any chat", selectCopy:"Select the text and copy it", thanks:"Thanks! Tap send in WhatsApp"},
+    copied:"Copied! Paste it into any chat", selectCopy:"Select the text and copy it"},
 
   fr:{dir:"ltr", name:"Français", title:"Formez le gouvernement · Knesset 26",
     eyebrow:"Élections à la 26e Knesset · 27 octobre 2026", h1:"Formez le gouvernement",
@@ -384,11 +448,19 @@ const I18N = {
     parties:"Partis", edit:"Modifier les sièges", done:"Terminé", clear:"Effacer",
     copy:"Copier", wa:"Envoyer sur WhatsApp", shareText:"Texte à partager", lang:"Langue",
     idea:"Suggérer une amélioration", ideaTitle:"Une idée pour améliorer le site ?", ideaPh:"Que changeriez-vous ou ajouteriez-vous ?",
-    ideaNote:"Le message s'ouvre dans votre WhatsApp. Appuyez sur Envoyer.", send:"Envoyer", close:"Fermer",
+    ideaNote:"Votre suggestion est envoyée de façon anonyme.", send:"Envoyer", close:"Fermer",
+    sending:"Envoi…", fbThanks:"Merci pour votre retour ! Votre suggestion a été envoyée.", sendFail:"L'envoi a échoué. Réessayez dans un instant.",
     blocs:{n:"Bloc Netanyahou", c:"Bloc du changement", a:"Partis arabes", o:"Sans bloc"}, arabShort:"Partis arabes",
     stamp:(u,s,done)=>`Dernière mise à jour : ${u}` + (done ? (s ? ` (source : ${s})` : "") : ` (mise à jour toutes les heures${s ? `, source : ${s}` : ""})`),
     counted:(n,done)=> done ? "Résultats · 100 % des voix dépouillées" : `Résultats partiels · ${n} % des voix dépouillées`,
     mine:(n,done)=> done ? "Mes chiffres · d'après les résultats complets" : `Mes chiffres · d'après les résultats partiels (${n} % des voix dépouillées)`,
+    voteCta:"Votez et faites-vous entendre !", voteSub:"Partagez votre choix, il parviendra peut-être aux décideurs...",
+    voteDone:"Vous avez voté pour ce gouvernement ✓", voteSeeResults:"Voir les résultats", voteChange:"Modifier votre vote",
+    voteChangeSub:"Vous pouvez voter pour un seul gouvernement. Votre vote précédent sera remplacé.", voting:"Envoi…", voteFail:"Votre vote n'a pas été enregistré. Réessayez.",
+    pollTitle:"Résultats du sondage", pollLink:n=>`Résultats du sondage · ${n} ${n===1 ? "vote" : "votes"}`,
+    pollMeta:(v,c)=>`${v} ${v===1 ? "vote" : "votes"} · ${c} ${c===1 ? "coalition" : "coalitions différentes"}`,
+    pollExamples:e=>`dont ${e} votes d'exemple`, pollEmpty:"Aucun vote pour l'instant. Soyez le premier à voter !", pollMine:"Votre choix",
+    pollPm:l=>`PM : ${l}`, pollSeats:s=>`${s} sièges`, pollVotes:n=>`${n} ${n===1 ? "vote" : "votes"}`,
     pick:"Choisissez des partis pour commencer",
     ok:(t,stable)=> stable ? `Gouvernement formé ! Majorité stable de ${t} sièges` : `Gouvernement formé ! Majorité de ${t} sièges`,
     short:n=>`Il manque ${n} ${n===1 ? "siège" : "sièges"} pour la majorité`,
@@ -403,7 +475,7 @@ const I18N = {
     shareNone:"Je n'ai pas encore choisi de partis. À vous :", sharePm:l=>`Premier ministre : ${l}`,
     shareTotal:(t,ok)=> ok ? `${t} sièges au total : gouvernement formé ✅` : `${t} sièges au total : il en manque ${61-t} ❌`,
     shareCta:"Saurez-vous former un meilleur gouvernement ?",
-    copied:"Copié ! Collez-le dans n'importe quelle conversation", selectCopy:"Sélectionnez le texte et copiez-le", thanks:"Merci ! Appuyez sur Envoyer dans WhatsApp"}
+    copied:"Copié ! Collez-le dans n'importe quelle conversation", selectCopy:"Sélectionnez le texte et copiez-le"}
 };
 const LANGS = ["he","en","fr"];
 const LANG_KEY = "coalition-lang";
@@ -590,6 +662,167 @@ function renderEditSum(){
   box.innerHTML = msg + back;
 }
 
+/* ---- poll: "vote and make an impact" ----
+   Two stores, same screen:
+   - Claude preview: this page's shared db, one vote per signed-in viewer at votes/<their id>.
+   - Live site: Firebase Realtime Database. tally/<pm>_<parties> holds a count per coalition and
+     voters/<browser id> holds that browser's current choice, so one vote per browser that can be
+     changed (the old coalition loses the vote, the new one gains it). The database rules allow
+     only +1/-1 changes and keep the voter list private. */
+const FIREBASE_URL = "https://coalition2026-bc563-default-rtdb.europe-west1.firebasedatabase.app";
+const VOTER_KEY = "coalition-voter", MYVOTE_KEY = "coalition-vote";
+const POLL = {ready:false, groups:[], total:0, examples:0, mine:null, busy:false, save:null, refresh:null};
+const BALLOT = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 13h16v7H4z"/><path d="M8 13V4h8v9"/><path d="m10 8.5 1.6 1.6L14.5 7"/></svg>';
+const coalKey = (pm, ids) => pm + "_" + [...ids].sort().join("-");
+function cleanVote(d){
+  if (!d || !Array.isArray(d.parties)) return null;
+  const parties = [...new Set(d.parties.filter(p=>typeof p==="string" && PARTIES[p]))];
+  if (!parties.length || !parties.includes(d.pm)) return null;
+  return {parties, pm:d.pm, example:d.example===true};
+}
+function parseKey(k){
+  const m = /^([a-z]{2})_([a-z]{2}(?:-[a-z]{2}){0,12})$/.exec(k || "");
+  return m ? cleanVote({pm:m[1], parties:m[2].split("-")}) : null;
+}
+function setGroups(items){  // items: [{pm, parties, n, example}]
+  const map = new Map();
+  items.forEach(it=>{
+    const k = coalKey(it.pm, it.parties);
+    const g = map.get(k) || {k, pm:it.pm, parties:it.parties, n:0};
+    g.n += it.n; map.set(k, g);
+  });
+  POLL.groups = [...map.values()].filter(g=>g.n>0);
+  POLL.total = POLL.groups.reduce((s,g)=>s+g.n, 0);
+  POLL.examples = items.filter(it=>it.example).reduce((s,it)=>s+it.n, 0);
+}
+function pollChanged(){ renderVote(); if (!$("pollModal").hidden) renderPoll(); }
+const lsGet = k => { try { return localStorage.getItem(k); } catch(e){ return null; } };
+const lsSet = (k,v) => { try { localStorage.setItem(k, v); } catch(e){} };
+
+async function initClaudePoll(){
+  if (!window.claude || typeof window.claude.use !== "function") return false;
+  const [db, user] = await Promise.all([window.claude.use("db"), window.claude.use("user")]);
+  if (!db || !user) return false;
+  const id = await user.id();
+  if (!id) return false;
+  const doc = db.doc("votes/" + id);
+  FEEDBACK_SAVE = msg => db.doc("feedback/" + id).collection("items").add({...msg, t:Date.now()});
+  POLL.save = vote => doc.set({parties:vote.parties, pm:vote.pm, t:Date.now()});
+  db.collection("votes").onSnapshot(snap=>{
+    const votes = snap.docs.map(d=>({id:d.id, v:cleanVote(d.data())})).filter(x=>x.v);
+    setGroups(votes.map(x=>({...x.v, n:1})));
+    const me = votes.find(x=>x.id===id);
+    POLL.mine = me ? me.v : null;
+    POLL.ready = true; pollChanged();
+  }, ()=>{ POLL.ready = false; pollChanged(); });
+  return true;
+}
+
+async function initFirebasePoll(){
+  if (!FIREBASE_URL) return false;
+  let voter = lsGet(VOTER_KEY);
+  if (!/^v[a-z0-9]{12,32}$/.test(voter || "")){
+    voter = "v" + Array.from(crypto.getRandomValues(new Uint8Array(20)), n=>"abcdefghijklmnopqrstuvwxyz0123456789"[n % 36]).join("");
+    lsSet(VOTER_KEY, voter);
+  }
+  FEEDBACK_SAVE = async msg => {
+    const r = await fetch(FIREBASE_URL + "/feedback.json", {method:"POST", body:JSON.stringify({...msg, t:{".sv":"timestamp"}})});
+    if (!r.ok) throw new Error(String(r.status));
+  };
+  let myKey = lsGet(MYVOTE_KEY);
+  POLL.mine = parseKey(myKey);
+  POLL.refresh = async () => {
+    const r = await fetch(FIREBASE_URL + "/tally.json", {cache:"no-store"});
+    if (!r.ok) throw new Error(String(r.status));
+    const data = (await r.json()) || {};
+    setGroups(Object.entries(data).map(([k,n])=>{
+      const v = parseKey(k);
+      return v && typeof n==="number" && n>0 ? {...v, n:Math.floor(n)} : null;
+    }).filter(Boolean));
+    POLL.ready = true; pollChanged();
+  };
+  POLL.save = async vote => {
+    const key = coalKey(vote.pm, vote.parties);
+    if (key === myKey) return;
+    const send = body => fetch(FIREBASE_URL + "/.json", {method:"PATCH", body:JSON.stringify(body)});
+    const body = {["voters/" + voter]: key, ["tally/" + key]: {".sv":{"increment":1}}};
+    const prev = parseKey(myKey) ? myKey : null;
+    if (prev) body["tally/" + prev] = {".sv":{"increment":-1}};
+    let r = await send(body);
+    if (!r.ok && prev){ delete body["tally/" + prev]; r = await send(body); }  // the old count may already be at 0
+    if (!r.ok) throw new Error(String(r.status));
+    myKey = key; lsSet(MYVOTE_KEY, key);
+    POLL.mine = parseKey(key);
+    await POLL.refresh().catch(()=>{});
+  };
+  await POLL.refresh();
+  return true;
+}
+
+async function initPoll(){
+  try { if (await initClaudePoll()) return; } catch(e){}
+  try { await initFirebasePoll(); } catch(e){ POLL.ready = false; pollChanged(); }
+}
+
+function renderVote(){
+  const coal = coalIds(), t = total(), pm = effectivePm();
+  const canVote = POLL.ready && state.src!=="m" && coal.length>0 && t>=61;
+  $("voteBox").hidden = !canVote;
+  $("pollLink").hidden = !POLL.ready;
+  if (POLL.ready) $("pollLink").textContent = T.pollLink(POLL.total);
+  if (!canVote) return;
+  const same = !!POLL.mine && coalKey(POLL.mine.pm, POLL.mine.parties) === coalKey(pm, coal);
+  const btn = $("voteBtn");
+  btn.classList.toggle("done", same);
+  btn.setAttribute("aria-busy", POLL.busy);
+  btn.innerHTML = POLL.busy ? `<span>${T.voting}</span>`
+    : same ? `<span>${T.voteDone} · ${T.voteSeeResults}</span>`
+    : BALLOT + `<span>${POLL.mine ? T.voteChange : T.voteCta}</span>`;
+  $("voteSub").hidden = same;
+  $("voteSub").textContent = POLL.mine ? T.voteChangeSub : T.voteSub;
+}
+function renderPoll(){
+  const real = SOURCES.real.seats, seatsFor = ps => ps.reduce((s,p)=>s+(real[p]||0),0);
+  const list = [...POLL.groups].sort((a,b)=> b.n-a.n || seatsFor(b.parties)-seatsFor(a.parties));
+  const all = POLL.total, max = list.length ? list[0].n : 1;
+  $("pollMeta").textContent = all ? T.pollMeta(all, list.length) + (POLL.examples ? ` · ${T.pollExamples(POLL.examples)}` : "") : "";
+  const mineKey = POLL.mine ? coalKey(POLL.mine.pm, POLL.mine.parties) : null;
+  $("pollList").innerHTML = !list.length ? `<li class="poll-empty">${T.pollEmpty}</li>` : list.map((g,i)=>{
+    const ordered = [g.pm, ...g.parties.filter(p=>p!==g.pm).sort((a,b)=>(real[b]||0)-(real[a]||0))];
+    const isMine = g.k === mineKey;
+    return `<li class="poll-row${isMine ? " mine" : ""}">
+      <div class="poll-top"><span class="poll-rank">${i+1}</span>
+        <div class="poll-parties">${ordered.map(p=>`<span class="pchip${p===g.pm ? " pm" : ""}" style="--c:${colorVar(p)}"><i></i>${pn(p)}</span>`).join("")}</div>
+        <span class="poll-pct">${Math.round(g.n/all*100)}%</span></div>
+      <div class="poll-bar"><span style="width:${g.n/max*100}%;background:${blocVar(PARTIES[g.pm].bloc)}"></span></div>
+      <div class="poll-foot"><span>${T.pollPm(pl(g.pm))} · ${T.pollSeats(seatsFor(g.parties))}</span><span>${isMine ? `<b class="mine-tag">${T.pollMine}</b> · ` : ""}${T.pollVotes(g.n)}</span></div>
+    </li>`;
+  }).join("");
+}
+let pollTimer = null;
+function openPoll(){
+  renderPoll(); $("pollModal").hidden = false; $("pollClose").focus();
+  if (POLL.refresh){  // the live site has no push updates: refresh while the results are open
+    POLL.refresh().catch(()=>{});
+    clearInterval(pollTimer); pollTimer = setInterval(()=>POLL.refresh().catch(()=>{}), 20000);
+  }
+}
+function closePoll(){ $("pollModal").hidden = true; clearInterval(pollTimer); }
+$("voteBtn").addEventListener("click", async ()=>{
+  if (POLL.busy || !POLL.save) return;
+  const coal = coalIds(), pm = effectivePm();
+  if (POLL.mine && coalKey(POLL.mine.pm, POLL.mine.parties) === coalKey(pm, coal)){ openPoll(); return; }
+  POLL.busy = true; renderVote();
+  try {
+    await POLL.save({parties:coal, pm});
+    POLL.mine = {parties:[...coal], pm, example:false};
+    POLL.busy = false; renderVote(); openPoll();
+  } catch(e){ POLL.busy = false; renderVote(); toast(T.voteFail); }
+});
+$("pollLink").addEventListener("click", openPoll);
+$("pollClose").addEventListener("click", closePoll);
+$("pollModal").addEventListener("click", e=>{ if (e.target === $("pollModal")) closePoll(); });
+
 let hadMajority = null;
 function render(){
   const coal = coalIds(), t = total(), pm = effectivePm();
@@ -631,6 +864,8 @@ function render(){
   renderEditSum();
   renderRows();
   renderChips();
+  renderVote();
+  if (!$("pollModal").hidden) renderPoll();
   writeHash();
   $("waBtn").href = "https://wa.me/?text=" + encodeURIComponent(shareText());
 }
@@ -672,23 +907,34 @@ $("copyBtn").addEventListener("click", ()=>{
   catch(e){ fallback(); }
 });
 
-/* ---- feedback: opens the visitor's WhatsApp with a message to the site owner ---- */
-const FEEDBACK_WA = "972546584377";
+/* ---- feedback: saved anonymously, nothing opens for the visitor ----
+   Claude preview: this page's db (feedback/<viewer>/items). Live site: Firebase feedback/,
+   which visitors can only add to; the owner reads it in the Firebase console. */
+let FEEDBACK_SAVE = null, ideaBusy = false;
 function setIdea(open){
   $("ideaSheet").hidden = !open;
   $("ideaBtn").setAttribute("aria-expanded", open);
-  if (open) $("ideaText").focus();
+  if (open){
+    $("ideaForm").hidden = false; $("ideaDone").hidden = true;
+    $("ideaSend").disabled = !$("ideaText").value.trim() || ideaBusy;
+    $("ideaText").focus();
+  }
 }
 $("ideaBtn").addEventListener("click", ()=>setIdea($("ideaSheet").hidden));
 $("ideaClose").addEventListener("click", ()=>setIdea(false));
-$("ideaText").addEventListener("input", ()=>{
-  const t = $("ideaText").value.trim();
-  const tag = state.lang==="he" ? "" : ` (${T.name})`;
-  $("ideaSend").setAttribute("aria-disabled", !t);
-  $("ideaSend").href = `https://wa.me/${FEEDBACK_WA}?text=` + encodeURIComponent(`💡 הצעה לשיפור לאתר הקואליציה${tag}:\n` + t);
-});
-$("ideaSend").addEventListener("click", ()=>{
-  setTimeout(()=>{ setIdea(false); $("ideaText").value=""; $("ideaSend").setAttribute("aria-disabled", true); toast(T.thanks); }, 300);
+$("ideaText").addEventListener("input", ()=>{ $("ideaSend").disabled = !$("ideaText").value.trim() || ideaBusy; });
+$("ideaSend").addEventListener("click", async ()=>{
+  const text = $("ideaText").value.trim().slice(0, 2000);
+  if (!text || ideaBusy) return;
+  ideaBusy = true; $("ideaSend").disabled = true; $("ideaSend").textContent = T.sending;
+  try {
+    if (!FEEDBACK_SAVE) throw new Error("no store");
+    await FEEDBACK_SAVE({text, lang:state.lang, link:location.href.slice(0, 600)});
+    $("ideaText").value = "";
+    $("ideaForm").hidden = true; $("ideaDone").textContent = T.fbThanks; $("ideaDone").hidden = false;
+    setTimeout(()=>{ if (!$("ideaDone").hidden) setIdea(false); }, 2600);
+  } catch(e){ toast(T.sendFail); }
+  finally { ideaBusy = false; $("ideaSend").textContent = T.send; $("ideaSend").disabled = !$("ideaText").value.trim(); }
 });
 
 /* ---- interactions ---- */
@@ -724,7 +970,8 @@ document.addEventListener("keydown", e=>{
   const inp = e.target.closest && e.target.closest("[data-seat]");
   if (inp && e.key==="Enter"){ inp.blur(); }
   if (e.key==="Escape"){
-    if (!$("langMenu").hidden){ setMenu(false); $("langBtn").focus(); }
+    if (!$("pollModal").hidden){ closePoll(); }
+    else if (!$("langMenu").hidden){ setMenu(false); $("langBtn").focus(); }
     else if (!$("ideaSheet").hidden) setIdea(false);
   }
 });
@@ -763,6 +1010,7 @@ if (state.hashLang) startLang = state.hashLang;
 setLang(startLang, false);
 if (wasShared) $("sharedBanner").hidden = false;
 render();
+initPoll();
 window.addEventListener("hashchange", ()=>{
   const shared = readHash();
   if (state.hashLang && state.hashLang!==state.lang) setLang(state.hashLang, false);
