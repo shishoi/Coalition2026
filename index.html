@@ -82,6 +82,7 @@ h1{font-family:var(--f-display);font-weight:800;letter-spacing:-.01em;font-size:
 .tally{position:absolute;inset:auto 0 0 0;display:flex;flex-direction:column;align-items:center;pointer-events:none}
 .tally .big{font-family:var(--f-display);font-weight:800;letter-spacing:-.02em;font-size:clamp(44px,13vw,64px);line-height:.9}
 .tally .of{font-size:13px;color:var(--muted);font-weight:600}
+.stamp{margin:0;text-align:center;font-size:12px;color:var(--muted)}
 .status{text-align:center;font-weight:700;font-size:18px;margin:0}
 .status.ok{color:var(--ok)}
 .status.short{color:var(--warn)}
@@ -178,11 +179,10 @@ h1{font-family:var(--f-display);font-weight:800;letter-spacing:-.01em;font-size:
   <header>
     <div class="eyebrow">בחירות לכנסת ה-26 · 27 באוקטובר 2026</div>
     <h1>הרכיבו את הממשלה</h1>
-    <p class="lede">בחרו מפלגות, הגיעו ל-61 מנדטים ושלחו את הקואליציה שלכם לחברים. אפשר לעבוד לפי המדגמים, לפי תוצאות האמת, או לשנות את המספרים בעצמכם.</p>
+    <p class="lede">בחרו מפלגות, הגיעו ל-61 מנדטים ושלחו את הקואליציה שלכם לחברים.</p>
+    <p class="lede">אפשר גם לשנות את מספרי המנדטים בעצמכם.</p>
   </header>
 
-  <div class="sources" id="sources" role="group" aria-label="מקור הנתונים"></div>
-  <p class="src-note" id="srcNote"></p>
 
   <div class="shared" id="sharedBanner" hidden>
     <span>זו קואליציה ששיתפו איתכם. אפשר לשנות אותה ולשלוח בחזרה.</span>
@@ -191,6 +191,7 @@ h1{font-family:var(--f-display);font-weight:800;letter-spacing:-.01em;font-size:
 
   <div class="grid">
     <section class="plenum" aria-label="מליאת הכנסת">
+      <p class="stamp" id="stamp"></p>
       <div class="hemi">
         <svg id="hemi" viewBox="-108 -106 216 112" role="img" aria-label="120 המושבים בכנסת"></svg>
         <div class="tally"><div class="big num" id="big">0</div><div class="of">מתוך 120 · רוב: 61</div></div>
@@ -220,11 +221,6 @@ h1{font-family:var(--f-display);font-weight:800;letter-spacing:-.01em;font-size:
   </div>
 
   <div id="fallbackBox" hidden><textarea class="fallback" id="fallbackText" readonly aria-label="טקסט לשיתוף"></textarea></div>
-
-  <div class="foot">
-    <p>המדגמים הם הערכה בלבד. תוצאות האמת הסופיות, כולל המעטפות הכפולות, צפויות להתפרסם בימים הקרובים. החלוקה לגושים היא זו שבה השתמשו ערוצי החדשות בליל הבחירות. אחוז החסימה: 3.25%, כ-4 מנדטים.</p>
-    <ul id="srcLinks"></ul>
-  </div>
 </div>
 
 <div class="dock">
@@ -259,12 +255,12 @@ const BLOC = {n:"גוש נתניהו", c:"גוש השינוי", a:"מפלגות 
 const blocVar = b => `var(--bloc-${b})`;
 
 const SOURCES = {
-  n12:{label:"מדגם חדשות 12", short:"עדכון 02:28", note:"מדגם חדשות 12 (מנו גבע ומכון מדגם), עדכון אחרון בליל הבחירות, 02:28.",
+  n12:{label:"מדגם חדשות 12", stamp:"מדגם חדשות 12 · עדכון 02:28", short:"עדכון 02:28", note:"מדגם חדשות 12 (מנו גבע ומכון מדגם), עדכון אחרון בליל הבחירות, 02:28.",
        seats:{lk:27,ys:21,bh:12,jl:12,dm:9,yb:7,sh:7,rm:7,ut:6,oy:6,rz:6}},
-  kan:{label:"מדגם כאן 11", short:"מדגם מעודכן", note:"מדגם כאן חדשות (קנטאר), אחרי העדכון של הלילה.",
+  kan:{label:"מדגם כאן 11", stamp:"מדגם כאן 11 · עדכון לילי", short:"מדגם מעודכן", note:"מדגם כאן חדשות (קנטאר), אחרי העדכון של הלילה.",
        seats:{lk:27,ys:21,bh:13,jl:11,dm:9,yb:8,rm:7,sh:6,ut:6,oy:6,rz:6}},
-  real:{label:"תוצאות אמת", short:"35.6% מהקלפיות · 05:27", note:"ספירת ועדת הבחירות: כ-1.77 מיליון קולות מ-4,274 קלפיות (35.6%), נכון ל-05:27. המנדטים מחושבים מאחוזי הקולות שנספרו, בלי הסכמי עודפים. המספרים עוד ישתנו, והמעטפות הכפולות עוד לא נספרו.",
-       seats:{lk:29,ys:20,jl:11,bh:11,ut:9,yb:8,oy:7,dm:7,sh:7,rz:7,rm:4}}
+  // LIVE-RESULTS (updated automatically, keep on one line)
+  real:{label:"תוצאות אמת", stamp:"תוצאות אמת חלקיות · עדכון אחרון: 28.10, נספרו 5,037 קלפיות (42%)", seats:{lk:28,ys:20,jl:12,bh:11,ut:8,yb:8,oy:7,dm:7,sh:7,rz:7,rm:5,hm:0,ay:0}}
 };
 const LINKS = [
   ["מדגם חדשות 12, עדכון 02:28 (זמן ישראל)","https://www.zman.co.il/live/737252/"],
@@ -280,8 +276,8 @@ const PRESETS = [
   ["ליכוד · ישר · ביחד",["lk","ys","bh"],null]
 ];
 
-const DEFAULT_SRC = "n12";
-const state = {src:DEFAULT_SRC, base:"n12", custom:null, sel:new Set(), pm:null, edit:false};
+const DEFAULT_SRC = "real";
+const state = {src:DEFAULT_SRC, base:DEFAULT_SRC, custom:null, sel:new Set(), pm:null, edit:false};
 const $ = id => document.getElementById(id);
 const seatsOf = id => state.src==="m" ? (state.custom[id]||0) : (SOURCES[state.src].seats[id]||0);
 const sumSeats = () => KEYS.reduce((s,id)=>s+seatsOf(id),0);
@@ -374,13 +370,7 @@ function setSeat(id, v){
 
 /* ---- rendering ---- */
 function renderSources(){
-  const list = Object.entries(SOURCES).map(([k,s])=>[k,s.label,s.short,""]);
-  if (state.custom) list.push(["m","המספרים שלי","עריכה ידנית","mine"]);
-  $("sources").innerHTML = list.map(([k,l,s,cls])=>
-    `<button type="button" class="src ${cls}" data-src="${k}" aria-pressed="${k===state.src}">${l}<small>${s}</small></button>`).join("");
-  $("srcNote").textContent = state.src==="m"
-    ? `מספרים שעדכנתם ידנית, על בסיס ${SOURCES[state.base].label}.`
-    : SOURCES[state.src].note;
+  $("stamp").textContent = state.src==="m" ? `המספרים שלי · על בסיס ${SOURCES[state.base].stamp}` : SOURCES[state.src].stamp;
 }
 
 function renderRows(){
@@ -418,7 +408,7 @@ function renderEditSum(){
   const s = sumSeats(), diff = s - 120;
   const msg = diff===0 ? `<b class="good">סה"כ 120 מנדטים ✓</b>`
     : `<b class="bad">סה"כ ${s} מנדטים · ${diff>0?`עודף של ${diff}`:`חסרים ${-diff}`} כדי להגיע ל-120</b>`;
-  const back = state.src==="m" ? `<button type="button" id="revert">חזרה למספרי ${SOURCES[state.base].label}</button>` : `<span>שנו מספר כדי ליצור תרחיש משלכם</span>`;
+  const back = state.src==="m" ? `<button type="button" id="revert">חזרה ל${SOURCES[state.base].label}</button>` : `<span>שנו מספר כדי ליצור תרחיש משלכם</span>`;
   box.innerHTML = msg + back;
 }
 
@@ -558,7 +548,6 @@ function readHash(){
 }
 
 $("presets").insertAdjacentHTML("beforeend", PRESETS.map((p,i)=>`<button type="button" class="chip" data-i="${i}"${p[2]?` style="--b:${blocVar(p[2])}"`:""}>${p[0]}</button>`).join(""));
-$("srcLinks").innerHTML = LINKS.map(([t,u])=>`<li><a href="${u}" target="_blank" rel="noopener">${t}</a></li>`).join("");
 buildHemi();
 if (readHash()) $("sharedBanner").hidden = false;
 render();
